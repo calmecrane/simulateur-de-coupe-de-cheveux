@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur de Coupe de Cheveux</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        #photo-container {
+            margin-bottom: 20px;
+        }
+        #haircut-selection {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 300px;
+            height: auto;
+            border-radius: 10px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>✂️ Simulateur de Coupe de Cheveux ✂️</header>
+
+    <div id="photo-container">
+        <input type="file" id="upload" accept="image/*">
+        <div id="user-photo-area">
+            <img id="user-photo" src="" alt="Votre photo" style="display:none;">
+        </div>
+    </div>
+
+    <div id="haircut-selection">
+        <h2>Choisissez une coupe :</h2>
+        <select id="haircut-list">
+            <option value="coupe1.png">Coupe Moderne</option>
+            <option value="coupe2.png">Coupe Dégradé</option>
+            <option value="coupe3.png">Coupe Bouclée</option>
+            <option value="coupe4.png">Coupe Carré</option>
+            <option value="coupe5.png">Coupe Undercut</option>
+        </select>
+        <br>
+        <button onclick="applyHaircut()">Appliquer la coupe</button>
+        <br><br>
+        <button onclick="downloadImage()">Enregistrer l'image</button>
+    </div>
+
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <footer style="margin-top: 40px;">
+        <small>Publicité : Votre pub ici 🎯</small>
+    </footer>
+
+    <script>
+        const upload = document.getElementById('upload');
+        const userPhoto = document.getElementById('user-photo');
+        const haircutList = document.getElementById('haircut-list');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let photoLoaded = false;
+
+        upload.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                userPhoto.src = URL.createObjectURL(file);
+                userPhoto.style.display = 'block';
+                photoLoaded = true;
+            }
+        });
+
+        function applyHaircut() {
+            if (!photoLoaded) {
+                alert("Merci d'importer votre photo d'abord !");
+                return;
+            }
+            const haircut = haircutList.value;
+            userPhoto.onload = () => {
+                canvas.width = userPhoto.width;
+                canvas.height = userPhoto.height;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(userPhoto, 0, 0);
+                const img = new Image();
+                img.src = haircut;
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, userPhoto.width, userPhoto.height);
+                    const dataURL = canvas.toDataURL();
+                    userPhoto.src = dataURL;
+                }
+            }
+            userPhoto.onload(); // trigger
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'nouvelle-coupe.png';
+            link.href = userPhoto.src;
+            link.click();
+        }
+    </script>
+
+</body>
+</html>
